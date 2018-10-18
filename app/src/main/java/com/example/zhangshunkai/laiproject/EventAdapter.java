@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -47,7 +48,13 @@ public class EventAdapter extends BaseAdapter{
         TextView eventTitle = convertView.findViewById(R.id.event_title);
         TextView eventAddress = (TextView) convertView.findViewById(R.id.event_address);
         TextView eventDescription = (TextView) convertView.findViewById(R.id.event_description);
-
+        ImageView eventImage = convertView.findViewById(R.id.event_thumbnail);
+        if(position == 8){
+            eventImage.setImageDrawable(context.getDrawable(R.drawable.thumbnail_8));
+        }
+        if(position == 9){
+            eventImage.setImageDrawable(context.getDrawable(R.drawable.thumbnail_9));
+        }
         Event e = eventData.get(position);
         eventTitle.setText(e.getTitle());
         eventAddress.setText(e.getAddress());

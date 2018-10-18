@@ -1,5 +1,6 @@
 package com.example.zhangshunkai.laiproject;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.widget.GridView;
 
 public class CommentFragment extends Fragment {
     private GridView mGridView;
+    OnItemSelectListener mCallback;
 
     public CommentFragment() {
         // Required empty public constructor
@@ -28,7 +30,7 @@ public class CommentFragment extends Fragment {
     }
 
     // Change background color if the item is selected
-    public void onItemSelected(int position){
+    public void onListItemSelected(int position){
         for (int i = 0; i < mGridView.getChildCount(); i++){
             if (position == i) {
                 mGridView.getChildAt(i).setBackgroundColor(Color.BLUE);
@@ -37,6 +39,22 @@ public class CommentFragment extends Fragment {
             }
         }
     }
+
+    // Container Activity must implement this interface
+    public interface OnItemSelectListener {
+        public void onCommentSelected(int position);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnItemSelectListener) context;
+        } catch (ClassCastException e) {
+            //do something
+        }
+    }
+
 
 
 }

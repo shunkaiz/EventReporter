@@ -2,6 +2,7 @@ package com.example.zhangshunkai.laiproject;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,11 +20,11 @@ public class EventFragment extends Fragment {
 
 
     private OnItemSelectListener mCallback;
+    private ListView mListView;
 
     public EventFragment() {
         // Required empty public constructor
     }
-
 
 
     // Container Activity must implement this interface
@@ -50,12 +51,12 @@ public class EventFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_event, container, false);
-        ListView listView = view.findViewById(R.id.event_list);
+        mListView = view.findViewById(R.id.event_list);
         //listView.setAdapter(new EventAdapter(getActivity()));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, getEventNames());
         // Assign adapter to ListView.
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mCallback.onItemSelected(i);
@@ -76,5 +77,14 @@ public class EventFragment extends Fragment {
         return names;
     }
 
+    public void onItemSelected(int position){
+        for (int i = 0; i < mListView.getChildCount(); i++){
+            if (position == i) {
+                mListView.getChildAt(i).setBackgroundColor(Color.BLUE);
+            } else {
+                mListView.getChildAt(i).setBackgroundColor(Color.parseColor("#FAFAFA"));
+            }
+        }
+    }
 
 }
