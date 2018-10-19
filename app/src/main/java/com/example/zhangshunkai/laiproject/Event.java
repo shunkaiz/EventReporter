@@ -4,6 +4,65 @@ public class Event {
     private String title;
     private String address;
     private String description;
+    private int like;
+    private String id;
+    private long time;
+    private String username;
+    private String imgUri;
+
+    public Event() {}
+
+    public int getLike() {
+        return like;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getImgUri() {
+        return imgUri;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setLike(int like) {
+        this.like = like;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setImgUri(String imgUri) {
+        this.imgUri = imgUri;
+    }
 
     /**
      * Constructor
