@@ -1,5 +1,7 @@
 package com.example.zhangshunkai.laiproject;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,10 +20,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class EventReportActivity extends AppCompatActivity {
 
     private static final String TAG = EventReportActivity.class.getSimpleName();
@@ -38,6 +36,11 @@ public class EventReportActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+
+    private static int RESULT_LOAD_IMAGE = 1;
+    private ImageView img_event_picture;
+    private Uri mImgUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +100,19 @@ public class EventReportActivity extends AppCompatActivity {
             }
         });
 
-    }
+        img_event_picture = findViewById(R.id.img_event_picture_capture);
+        mImageViewCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(
+                        Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, RESULT_LOAD_IMAGE);
+            }
 
+
+        });
+    }
     private String uploadEvent() {
         String title = mEditTextTitle.getText().toString();
         String location = mEditTextLocation.getText().toString();
@@ -149,6 +163,22 @@ public class EventReportActivity extends AppCompatActivity {
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+                Uri selectedImage = data.getData();
+                img_event_picture.setVisibility(View.VISIBLE);
+                img_event_picture.setImageURI(selectedImage);
+                mImgUri = selectedImage;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
