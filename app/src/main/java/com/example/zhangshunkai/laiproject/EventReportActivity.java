@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,6 +22,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class EventReportActivity extends AppCompatActivity {
 
     private static final String TAG = EventReportActivity.class.getSimpleName();
@@ -41,6 +50,10 @@ public class EventReportActivity extends AppCompatActivity {
     private ImageView img_event_picture;
     private Uri mImgUri;
 
+    //Set varialbes ready for uploading images
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +71,11 @@ public class EventReportActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String key = uploadEvent();
+                if (mImgUri != null) {
+                    uploadImage(key);
+                    mImgUri = null;
+                }
+
             }
         });
 
@@ -68,8 +86,10 @@ public class EventReportActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                // wierd issue with anonymous login
+                if (user == null) {
+                    //Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Log.d(TAG, "onAuthStateChanged:signed_in:");
                 } else {
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
@@ -77,12 +97,14 @@ public class EventReportActivity extends AppCompatActivity {
         };
 
         //sign in anonymously
-        mAuth.signInAnonymously().addOnCompleteListener(this,  new OnCompleteListener<AuthResult>() {
-            @Override
+        mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>(){
+        @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 Log.d(TAG, "signInAnonymously:onComplete:" + task.isSuccessful());
                 if (!task.isSuccessful()) {
                     Log.w(TAG, "signInAnonymously", task.getException());
+                    FirebaseUser user = mAuth.getCurrentUser();
+
                 }
             }
         });
@@ -91,14 +113,32 @@ public class EventReportActivity extends AppCompatActivity {
         mLocationTracker.getLocation();
         final double latitude = mLocationTracker.getLatitude();
         final double longitude = mLocationTracker.getLongitude();
+        new AsyncTask<Void, Void, Void>() {
+            private List<String> mAddressList = new ArrayList<>();
+
+            @Override
+            protected Void doInBackground(Void... urls) {
+                mAddressList = mLocationTracker.getCurrentLocationViaJSON(latitude,longitude);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void input) {
+                if (mAddressList.size() >= 3) {
+                    mEditTextLocation.setText(mAddressList.get(0) + ", " + mAddressList.get(1) +
+                            ", " + mAddressList.get(2) + ", " + mAddressList.get(3));
+                }
+            }
+        }.execute();
+
 
         mImageLocation = findViewById(R.id.img_event_location);
-        mImageLocation.setOnClickListener(new View.OnClickListener() {
+/*        mImageLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mEditTextLocation.setText(mLocationTracker.getLocation().toString());
             }
-        });
+        });*/
 
         img_event_picture = findViewById(R.id.img_event_picture_capture);
         mImageViewCamera.setOnClickListener(new View.OnClickListener() {
@@ -109,9 +149,12 @@ public class EventReportActivity extends AppCompatActivity {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, RESULT_LOAD_IMAGE);
             }
-
-
         });
+
+        //Initialize cloud storage
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+
     }
     private String uploadEvent() {
         String title = mEditTextTitle.getText().toString();
@@ -146,6 +189,7 @@ public class EventReportActivity extends AppCompatActivity {
                 }
             }
         });
+        database.child("events").child(key).child("why").setValue("yes");
         return key;
     }
 
@@ -181,6 +225,45 @@ public class EventReportActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
     }
+
+
+    /**
+     * Upload image picked up from gallery to Firebase Cloud storage
+     * @param eventId eventId
+     */
+    private void uploadImage(final String eventId) {
+        if (mImgUri == null) {
+            return;
+        }
+        final StorageReference imgRef = storageRef.child("images/" + mImgUri.getLastPathSegment() + "_"
+                + System.currentTimeMillis());
+
+        //UploadTask uploadTask = imgRef.putFile(mImgUri);
+
+        // Register observers to listen for when the download is done or if it fails
+        imgRef.putFile(mImgUri).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                String message = exception.getMessage();
+                database.child("events").child(eventId).child("uploadFailed").setValue(true);
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                imgRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>()
+                {
+                    @Override
+                    public void onSuccess(Uri downloadUrl)
+                    {
+                        database.child("events").child(eventId).child("imgUri").
+                                setValue(downloadUrl.toString());
+                        Log.i(TAG, "upload successfully" + eventId);
+
+                    }
+                });
+            }
+        });
+        }
 
 
 }
