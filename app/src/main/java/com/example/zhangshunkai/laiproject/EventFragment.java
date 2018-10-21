@@ -5,12 +5,17 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.google.firebase.database.DatabaseReference;
+
+import java.util.List;
 
 
 /**
@@ -21,6 +26,8 @@ public class EventFragment extends Fragment {
 
     private OnItemSelectListener mCallback;
     private ListView mListView;
+
+
 
     public EventFragment() {
         // Required empty public constructor
