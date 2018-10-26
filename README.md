@@ -3,7 +3,8 @@
 ### Author
 [Shunkai Zhang](http://github.com/shunkaiz)
 ### About 
-
+We all know that the friend's zone of WeChat is amazing, but it only tells a limited range of events happening around your friends.  
+Check out this android app! It will present all events happening around you. You may post your customized comments and follow an interesting stranger.
 ### Installation Instructions
 
 ##### Built with
