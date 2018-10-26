@@ -1,5 +1,5 @@
 
-# EventReporter
+## EventReporter
 ### Author
 [Shunkai Zhang](http://github.com/shunkaiz)
 ### About 
@@ -7,21 +7,21 @@ We all know that the friend's zone of WeChat is amazing, but it only tells a lim
 Check out this android app! It will present all events happening around you. You may post your customized comments and follow an interesting stranger.
 ### Installation Instructions
 
-##### Built with
+#### Built with
 * Java/XML for Android
 * Google Map/Geocoding/ AdMob API
 * Firebase Lifetime Database/Storage/FCM
 
-##### Download Prerequites
+#### Download Prerequites
 * The project is developed with Andorid Studio. For best performance, please download and install [android studio](https://developer.android.com/studio/)
 to your local device.
-##### Clone the Repo
+#### Clone the Repo
 In your command line/terminal, type in:
 ```
 git clone git@github.com:shunkaiz/NBA-ShotChart.git
 ```
 Then, start your Android Studio and import the cloned folders
-##### Download Dependencies
+#### Download Dependencies
 * To connect Firebase with Android Studio, please check out this [page](https://firebase.google.com/docs/android/setup)  
 * To add Google APIs in the project, please follow the [official instructions](https://developers.google.com/maps/documentation/android-sdk/start) 
 
